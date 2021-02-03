@@ -58,7 +58,7 @@
         "wasm": {
             "aliases": ["wasm", "swiftwasm"],
             "repos": {
-                "llvm-project": "swiftwasm",
+                "llvm-project": "maxd/main-merge",
                 "swift": "swiftwasm",
                 "cmark": "main",
                 "llbuild": "main",
