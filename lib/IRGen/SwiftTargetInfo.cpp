@@ -167,6 +167,7 @@ static void configureWasm32(IRGenModule &IGM, const llvm::Triple &triple,
                             SwiftTargetInfo &target) {
   target.LeastValidPointerValue =
     SWIFT_ABI_WASM32_LEAST_VALID_POINTER;
+  target.UsableRelativePointer = false;
 }
 
 /// Configure a default target.
@@ -244,6 +245,13 @@ SwiftTargetInfo SwiftTargetInfo::get(IRGenModule &IGM) {
     break;
   }
 
+  if (!target.UsableRelativePointer) {
+    // If using absolute pointer, the target arch must be less than 32bit
+    // because many runtime struct expect it aligned under 4 byte. Unless that,
+    // runtime structs will have extra padding bytes for alignments and it
+    // breaks runtime assumption.
+    assert(DataLayout.getPointerSizeInBits() <= 32);
+  }
   return target;
 }
 

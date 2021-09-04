@@ -2741,9 +2741,7 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
                                                           IGM.SizeTy);
 
     llvm::Value *stringAddr;
-    if (IGM.TargetInfo.OutputObjectFormat == llvm::Triple::Wasm) {
-      stringAddr = subIGF.Builder.CreateIntToPtr(stringAddrOffset, IGM.Int8PtrTy);
-    } else {
+    if (IGM.TargetInfo.UsableRelativePointer) {
       auto stringAddrBase = subIGF.Builder.CreatePtrToInt(cache, IGM.SizeTy);
       if (IGM.getModule()->getDataLayout().isBigEndian()) {
         stringAddrBase = subIGF.Builder.CreateAdd(stringAddrBase,
@@ -2752,6 +2750,9 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
       stringAddr = subIGF.Builder.CreateAdd(stringAddrBase,
                                                 stringAddrOffset);
       stringAddr = subIGF.Builder.CreateIntToPtr(stringAddr, IGM.Int8PtrTy);
+    } else {
+      stringAddr =
+          subIGF.Builder.CreateIntToPtr(stringAddrOffset, IGM.Int8PtrTy);
     }
 
     llvm::CallInst *call;
